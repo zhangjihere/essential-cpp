@@ -37,8 +37,11 @@ template <typename elemType>
 void display_vector( const vector<elemType> &vec,
                      ostream &os=cout, int len= 8 )
 {
-	 vector<elemType>::const_iterator
-               iter = vec.begin(),
+//	 vector<elemType>::const_iterator
+	//参考：https://stackoverflow.com/questions/8246117/compiling-error-on-template-method-return-is-instance-from-inner-class
+	//使用如下兼容性方案，把typename放到适当的位置
+	typename vector<elemType>::const_iterator
+               iter = vec.cbegin(),
                end_it = vec.end();
 
     int elem_cnt = 1;

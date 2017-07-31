@@ -11,22 +11,22 @@
 using namespace std;
 
 template <typename elemType>
-class Matrix 
+class Matrix
 {
-    friend Matrix<elemType> 
-    operator+( const Matrix<elemType>&, const Matrix<elemType>& );
-
-    friend Matrix< elemType > 
-    operator*( const Matrix<elemType>&, const Matrix<elemType>& );
+//    friend Matrix<elemType>
+//    operator+( const Matrix<elemType>&, const Matrix<elemType>& );
+//    friend Matrix< elemType >
+//    operator*( const Matrix<elemType>&, const Matrix<elemType>& );
+    //把操作符重载的声明，移到Matrix类外面，去掉friend关键字，增加模板泛型定义，见52到-57行
 
 public:
     Matrix( int rows, int columns );
     Matrix( const Matrix& );
-    ~Matrix(){ delete [] _matrix; } 
+    ~Matrix(){ delete [] _matrix; }
     Matrix& operator=( const Matrix& );
 
     void operator+=( const Matrix& );
-    elemType& operator()( int row, int column ) 
+    elemType& operator()( int row, int column )
         { return _matrix[ row * cols() + column ]; }
 
     const elemType& operator()( int row, int column ) const
@@ -35,7 +35,7 @@ public:
     int rows() const { return _rows; }
     int cols() const { return _cols; }
 
-    bool same_size( const Matrix &m ) const 
+    bool same_size( const Matrix &m ) const
          { return rows() == m.rows() && cols() == m.cols(); }
 
     bool comfortable( const Matrix &m ) const
@@ -50,12 +50,19 @@ protected:
 };
 
 template <typename elemType>
+ Matrix<elemType>
+operator+( const Matrix<elemType>&, const Matrix<elemType>& );
+template <typename elemType>
+ Matrix< elemType >
+operator*( const Matrix<elemType>&, const Matrix<elemType>& );
+
+template <typename elemType>
 inline ostream& operator<<( ostream& os, const Matrix<elemType> &m )
     { return m.print( os ); }
 
 // end of Matrix.h
 template <typename elemType>
-Matrix< elemType > 
+Matrix< elemType >
 operator+( const Matrix<elemType> &m1, const Matrix<elemType> &m2 )
 {
     assert( m1.same_size( m2 ) != 0 );
@@ -66,7 +73,7 @@ operator+( const Matrix<elemType> &m1, const Matrix<elemType> &m2 )
 }
 
 template <typename elemType>
-Matrix<elemType> 
+Matrix<elemType>
 operator*( const Matrix<elemType> &m1, const Matrix<elemType> &m2 )
 {
     assert( m1.comfortable( m2 ) != 0 );
@@ -86,7 +93,9 @@ template <typename elemType>
 void Matrix<elemType>::operator+=( const Matrix &m )
 {
     assert( same_size( m ) != 0 );
-    register int matrix_size = cols() * rows();
+//    register int matrix_size = cols() * rows();
+    //register 关键字在C++11中deprecated
+    int matrix_size = cols() * rows();
 
     for ( int ix = 0; ix < matrix_size; ++ix )
         ( *( _matrix + ix )) += ( *( m._matrix + ix ));
@@ -95,8 +104,11 @@ void Matrix<elemType>::operator+=( const Matrix &m )
 template <typename elemType>
 ostream& Matrix<elemType>::print( ostream &os ) const
 {
-    register int col = cols();
-    register int matrix_size = col * rows();
+//    register int col = cols();
+//    register int matrix_size = col * rows();
+    //register 关键字在C++11中deprecated
+    int col = cols();
+    int matrix_size = col * rows();
 
     for ( int ix = 0; ix < matrix_size; ++ix )
     {
@@ -167,8 +179,8 @@ void ex6_2()
 	log << "identity after set: " << identity << endl;
 
 	Matrix<float> m( identity );
-	log << "m: memberwise initialized: " << m << endl; 
-	
+	log << "m: memberwise initialized: " << m << endl;
+
 	Matrix<float> m2( 8, 12 );
 	log << "m2: 8x12: " <<  m2  << endl;
 

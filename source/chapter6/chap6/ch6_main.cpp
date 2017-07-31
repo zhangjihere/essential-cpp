@@ -118,7 +118,9 @@ template <int length, int beg_pos>
 void Fibonacci<length,beg_pos>::
 gen_elems( int pos ) const
 {   
-	if ( pos <= 0 || pos > max_elems() )
+//	if ( pos <= 0 || pos > max_elems() )
+	//兼容性解决方案，使用num_sequence的子类Fibonacci来调用方法max_elemes(),虽然这个方法是定义在前者中
+	if ( pos <= 0 || pos > Fibonacci::max_elems() )
 		 return;
 
     if ( _elems.empty() )

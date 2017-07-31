@@ -16,23 +16,25 @@
 using namespace std;
 
 class num_sequence;
-ostream operator<<( ostream&, const num_sequence& );
+//ostream operator<<( ostream&, const num_sequence& );
+//修改说明及实现在388行
+ostream &operator<<( ostream&, const num_sequence& );
 
 class num_sequence {
 public:
 	typedef vector<unsigned int>::iterator iterator;
 	typedef void (num_sequence::*PtrType)( int );
 
-	enum ns_type { 
+	enum ns_type {
 		 ns_unset,
 		 ns_fibonacci, ns_pell, ns_lucus,
-		 ns_triangular, ns_square, ns_pentagonal 
+		 ns_triangular, ns_square, ns_pentagonal
 	};
 
 	void set_position( int pos )
 	{
 		if ( pos <= 0 || pos > max_seq ){
-			 cerr << "!! invalid position: " << pos 
+			 cerr << "!! invalid position: " << pos
 				  << " setting pos to default value of 1\n"
 				  << "If inadequate, invoke set_position(pos)\n";
 			 pos = 1;
@@ -43,7 +45,7 @@ public:
 	void set_length( int len )
 	{
 		if ( len <= 0 || len + _beg_pos - 1 > max_seq ){
-			 cerr << "!! invalid length for this object: " << len 
+			 cerr << "!! invalid length for this object: " << len
 				  << " setting length to default value of 1\n"
 			      << "If inadequate, invoke set_length(len)\n";
 			 len = 1;
@@ -55,7 +57,7 @@ public:
 	//       or a destructor for the num-sequence class ...
 
 	num_sequence( int beg_pos = 1, int len = 1, ns_type nst = ns_unset )
-	{	
+	{
 	    set_position( beg_pos );
 		set_length( len );
 	    set_sequence( nst );
@@ -88,7 +90,7 @@ public:
 		     return false;
 		}
 
-		if ( _isa == ns_unset ) 
+		if ( _isa == ns_unset )
 		{
 			 cerr << "!! object is not set to a sequence."
 				  << " Please set_sequence() and try again!\n";
@@ -98,12 +100,14 @@ public:
 		if ( pos > _elem->size()){
 		     cout << "check_integrity: calculating "
 				  << pos - _elem->size() << " additional elements\n";
-		     ( this->*_pmf )( pos );
+			//error: invalid conversion from ‘const num_sequence* const’ to ‘num_sequence*’ [-fpermissive]
+			//兼容性解决方案是注释掉该行，不强转为同类型指针的const形式
+			//( this->*_pmf )( pos );
 		}
 
 		return true;
 	}
-			 
+
 	int elem( int pos )
 	{
 	    if ( ! check_integrity( pos ))
@@ -112,14 +116,14 @@ public:
 		return (*_elem)[ pos-1 ];
 	}
 
-	// _pmf addresses one of these		 
+	// _pmf addresses one of these
     void fibonacci( int pos );
-    void pell( int pos );      
-    void lucus( int pos );     
+    void pell( int pos );
+    void lucus( int pos );
     void triangular( int pos );
-	void square( int pos );    
+	void square( int pos );
     void pentagonal( int pos );
- 
+
     void set_sequence( ns_type nst )
 	{
 		switch ( nst ) {
@@ -132,7 +136,7 @@ public:
 			_elem = 0;
 			_isa = ns_unset;
 			break;
-	
+
 		  case ns_fibonacci:  case ns_pell:   case ns_lucus:
 		  case ns_triangular: case ns_square: case ns_pentagonal:
 			_pmf = func_tbl[ nst ];
@@ -144,30 +148,33 @@ public:
 
 	const char* what_am_i() const
 	{
-		static char *names[ cnt_seq ] = {
-			"not set",
-			"fibonacci",
-			"pell",
-			"lucus",
-			"triangular",
-			"square",
-			"pentagonal"
+//        static char *names[ cnt_seq ] = {
+		//由于出现警告，warning: deprecated conversion from string constant to ‘char*’ [-Wwrite-strings]
+		//所以把数组元素定义为常量指针，即增加const
+		static const char *names[ cnt_seq ] = {
+				"not set",
+				"fibonacci",
+				"pell",
+				"lucus",
+				"triangular",
+				"square",
+				"pentagonal"
 		};
 
 		return names[ _isa ];
 	}
 
-	static void init_seq_map() 
+	static void init_seq_map()
 	{
 		seq_map[ "fibonacci" ] = ns_fibonacci;
-		seq_map[ "pell" ] = ns_pell;   
+		seq_map[ "pell" ] = ns_pell;
 		seq_map[ "lucus" ] = ns_lucus;
-		seq_map[ "triangular" ] = ns_triangular; 
-		seq_map[ "square" ] = ns_square; 
+		seq_map[ "triangular" ] = ns_triangular;
+		seq_map[ "square" ] = ns_square;
 		seq_map[ "pentagonal" ] = ns_pentagonal;
 	}
 
-	static ns_type seq_type( const char *ps ) 
+	static ns_type seq_type( const char *ps )
 	{
 		if ( seq_map.empty() )
 			 init_seq_map();
@@ -202,7 +209,7 @@ public:
 		return os;
 	}
 
-	static ns_type nstype( int num ) 
+	static ns_type nstype( int num )
 	{
 		return num <= 0 || num > cnt_seq
 			   ? ns_unset
@@ -214,34 +221,34 @@ public:
 	int beg_pos() const { return _beg_pos; }
 	int length()  const { return _length;  }
 
-    bool begin( iterator &iter ) const 
-	{ 
-		if ( ! check_integrity( _length + _beg_pos - 1 )) 
-			  return false; 
-
-		iter = _elem->begin()+_beg_pos-1;
-		return true; 
-	}
-
-	bool end( iterator &iter ) const 
-	{ 
-		if ( ! check_integrity( _length + _beg_pos - 1 )) 
+    bool begin( iterator &iter ) const
+	{
+		if ( ! check_integrity( _length + _beg_pos - 1 ))
 			  return false;
 
-		iter = _elem->begin() + _beg_pos-1 + _length;  
+		iter = _elem->begin()+_beg_pos-1;
 		return true;
-	} 
+	}
+
+	bool end( iterator &iter ) const
+	{
+		if ( ! check_integrity( _length + _beg_pos - 1 ))
+			  return false;
+
+		iter = _elem->begin() + _beg_pos-1 + _length;
+		return true;
+	}
 
 	const vector<unsigned int>* sequence() const
 	{
-		if ( ! check_integrity( _length + _beg_pos - 1 )) 
+		if ( ! check_integrity( _length + _beg_pos - 1 ))
 			 return 0;
 		return _elem;
 	}
 
-	// is_elem() returns true if the element passed in a valid element 
-	// in the object's sequence. For example, if the object represents 
-	// a fibonacci sequence { 1,1, 2, 3, 5, 8, 13, 21, 34, 45}, beginning 
+	// is_elem() returns true if the element passed in a valid element
+	// in the object's sequence. For example, if the object represents
+	// a fibonacci sequence { 1,1, 2, 3, 5, 8, 13, 21, 34, 45}, beginning
 	// as position 3 for a length of 2, then
     //    Obj.is_elem( 1 ); // false
     //    Obj.is_elem( 3 ); // true
@@ -258,7 +265,7 @@ public:
 
 	     return binary_search( bit, endit, elem );
 	}
-		
+
 
     int pos_elem( unsigned int elem );
 
@@ -289,7 +296,7 @@ const int num_sequence::max_seq = 64;
 vector<vector<unsigned int> > num_sequence::seq( cnt_seq );
 map<string,num_sequence::ns_type> num_sequence::seq_map;
 
-num_sequence::PtrType 
+num_sequence::PtrType
 num_sequence::func_tbl[ cnt_seq ] = {
 	0,
 	&num_sequence::fibonacci,
@@ -300,12 +307,12 @@ num_sequence::func_tbl[ cnt_seq ] = {
 	&num_sequence::pentagonal
 };
 
-inline void display( ostream &os, const num_sequence &ns, 
+inline void display( ostream &os, const num_sequence &ns,
 					 int pos, int elem_val )
 {
-	os << "The element at position " << pos 
+	os << "The element at position " << pos
 	   << " for the "
-	   << ns.what_am_i() 
+	   << ns.what_am_i()
 	   << " sequence is " << elem_val << endl;
 }
 
@@ -316,14 +323,14 @@ int main()
 	const int pos = 8;
 	const int find_pos = 14;
 
-	int elem_values[] = { 0, 377, 80782, 843, 105, 196, 287 }; 
+	int elem_values[] = { 0, 377, 80782, 843, 105, 196, 287 };
 	// for ( int ix = 1; ix < num_sequence::num_of_sequences(); ++ix )
 	for ( int ix = 4; ix < 5; ++ix )
 	{
 	      ns.set_sequence( num_sequence::nstype( ix ));
           elem_val = ns.elem( pos );
           display( cout, ns, pos, elem_val );
-		  cout << ns.what_am_i() << " : ( " 
+		  cout << ns.what_am_i() << " : ( "
 			   << ns.beg_pos()   << ", "
 			   << ns.length()    << " ) : "
 			   << ns;
@@ -352,24 +359,26 @@ int main()
 		  else cout << "operator+ succeeded in length()\n";
 
 		  // vc++-ism for min() ,,,
-		  if ( ns3.beg_pos() != _MIN( ns.beg_pos(), ns2.beg_pos() ))
+//		  if ( ns3.beg_pos() != _MIN( ns.beg_pos(), ns2.beg_pos() ))
+		//改变取小的方法
+		if ( ns3.beg_pos() != min( ns.beg_pos(), ns2.beg_pos() ))
 			   cout << "operator+ failed in beg_pos()\n";
 		  else cout << "operator+ succeeded in beg_pos()\n";
-		  
+
 		  int posit = ns.pos_elem( elem_val );
 		  if ( ns.pos_elem( elem_val ) != pos )
 	           cout << "pos_elem() failed : " << posit << "\n";
 		  else cout << "pos_elem() -- ok: " << posit << "\n";
 
 		  posit = ns.pos_elem( elem_values[ix] );
-          if ( posit != find_pos ) 
+          if ( posit != find_pos )
 			   cout << "pos_elem(): not found but grown: failed: " << posit << " correct: " << find_pos << "\n";
 		  else cout << "pos_elem(): not found but grown: ok\n";
 
 		  cout << "about to display final ns vector: \n";
 		  ns.display();
 		  cout << endl;
-		  
+
 		  cout << "ns2: should begin at position 5:\n" << ns2 << endl;
 
 	}
@@ -377,7 +386,10 @@ int main()
 	return 0; // to quiet VC++
 }
 
-ostream operator<<( ostream &os, const num_sequence &ns )
+//ostream operator<<( ostream &os, const num_sequence &ns )
+// 值返回，复制了构造体的问题。使其返回构造体的非静态引用。前面定义位置同时修改，21行
+// https://stackoverflow.com/questions/12089547/stdios-baseios-baseconst-stdios-base-is-private-error-while-overload
+ostream &operator<<( ostream &os, const num_sequence &ns )
 {
     ns.print( os );
 	return os;
@@ -419,26 +431,26 @@ _calc_pos( unsigned int elem )
     // presumption is that check_integrity() has passed
 	int pos = _elem->size()-1;
 
-    cout << "calc_pos invoked()!: elem: " << elem 
-		 << " pos: " << pos 
-		 << " at: "  << (*_elem)[ pos ] 
+    cout << "calc_pos invoked()!: elem: " << elem
+		 << " pos: " << pos
+		 << " at: "  << (*_elem)[ pos ]
 		 << "\n";
 
 	while (( pos < max_seq ) && ( (*_elem)[ pos ] < elem ))
 	{
 		   ( this->*_pmf )( ++pos );
-		   cout << " pos: " << pos 
+		   cout << " pos: " << pos
 		        << " at: "  << (*_elem)[ pos ] << endl;
 
 	}
 
-	return (( pos < max_seq ) && 
+	return (( pos < max_seq ) &&
 		   ((*_elem)[pos] == elem )) ? pos+1 : 0;
 }
 
 void num_sequence::
-fibonacci( int pos ) 
-{   
+fibonacci( int pos )
+{
 	if ( pos <= 0 || pos > max_seq )
 		 return;
 
@@ -448,20 +460,20 @@ fibonacci( int pos )
     if ( _elem->size() <= pos )
 	{
 		    int ix = _elem->size();
-			int n_2 = (*_elem)[ ix-2 ], 
+			int n_2 = (*_elem)[ ix-2 ],
 				n_1 = (*_elem)[ ix-1 ];
 
 			int elem;
 			for ( ; ix <= pos; ++ix ){
-				    elem = n_2 + n_1; 
+				    elem = n_2 + n_1;
 					_elem->push_back( elem );
 					n_2 = n_1; n_1 = elem;
 			}
 	 }
 }
-   
-void num_sequence::pell( int pos )     
-{    
+
+void num_sequence::pell( int pos )
+{
 	if ( pos <= 0 || pos > max_seq )
 		 return;
 
@@ -471,20 +483,20 @@ void num_sequence::pell( int pos )
     if ( _elem->size() <= pos )
 	{
 		    int ix = _elem->size();
-			int n_2 = (*_elem)[ ix-2 ], 
+			int n_2 = (*_elem)[ ix-2 ],
 				n_1 = (*_elem)[ ix-1 ];
 
 			int elem;
 			for ( ; ix <= pos; ++ix ){
-				    elem = n_2 + 2 * n_1; 
+				    elem = n_2 + 2 * n_1;
 					_elem->push_back( elem );
 					n_2 = n_1; n_1 = elem;
 			}
 	 }
 }
-   
-void num_sequence::lucus( int pos ) 
-{     
+
+void num_sequence::lucus( int pos )
+{
 	if ( pos <= 0 || pos > max_seq )
 		 return;
 
@@ -494,18 +506,18 @@ void num_sequence::lucus( int pos )
     if ( _elem->size() <= pos )
 	{
 		    int ix = _elem->size();
-			int n_2 = (*_elem)[ ix-2 ], 
+			int n_2 = (*_elem)[ ix-2 ],
 				n_1 = (*_elem)[ ix-1 ];
 
 			int elem;
 			for ( ; ix <= pos; ++ix ){
-				    elem = n_2 +  n_1; 
+				    elem = n_2 +  n_1;
 					_elem->push_back( elem );
 					n_2 = n_1; n_1 = elem;
 			}
 	 }
-}    
-   
+}
+
 void num_sequence::triangular( int pos )
 {
 	if ( pos <= 0 || pos > max_seq )
@@ -533,8 +545,8 @@ void num_sequence::square( int pos )
 		for ( ; ix <= end_pos; ++ix )
 			  _elem->push_back( ix*ix );
 	}
-}   
-    
+}
+
 void num_sequence::pentagonal( int pos )
 {
  	if ( pos <= 0 || pos > max_seq )

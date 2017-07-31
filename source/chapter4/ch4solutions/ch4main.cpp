@@ -185,6 +185,8 @@ inline UserProfile::UserProfile( string login, uLevel level )
 {}
 
 #include <cstdlib>
+//增加这个头文件，是配合下面方案2的兼容性调整，204行
+#include <sstream>
 inline UserProfile::UserProfile()
     : _login( "guest" ), _user_level( Beginner ), 
       _times_logged( 1 ), _guesses( 0 ), _correct_guesses( 0 )
@@ -195,10 +197,18 @@ inline UserProfile::UserProfile()
    // Standard C library function in <cstdlib>
    // turns an integer into an ascii representation
    // _itoa( int value, char *buffer, int radix )
-   _itoa( id++, buffer, 10 );
-
-   // add a unique id during session to guest login
-   _login += buffer;
+//   _itoa( id++, buffer, 10 );
+    //    方案1，更改为如下风格,在centOS7 64bits 上gcc4.8.5，出问题，error:'to_string' is not a member of 'std'
+    //    string s = std::to_string(id++);
+    //    方案2，再更改为如下形式，有效
+    stringstream stream;
+    stream << id++;
+    // add a unique id during session to guest login
+//   _login += buffer;
+    //    方案1，更改为如下风格，,在centOS7 64bits 上gcc4.8.5，出问题
+    //    _login += s.c_str();
+    //    方案2，再更改为如下形式，有效
+    _login += stream.str().c_str();
 }
    
 /*

@@ -43,7 +43,7 @@ bool print_sequence( int pos )
    cout << "The Fibonacci Sequence for "
         << pos << " positions: \n\t";
 
-   // prints “1 1” for all values except pos == 1
+   // prints ï¿½1 1ï¿½ for all values except pos == 1
    switch ( pos ) {
        default:
        case 2:
@@ -266,7 +266,7 @@ fibon_seq2( int size )
 
    if ( size <= 0 || size > max_size ){
         cerr << "fibon_seq(): oops: invalid size: "
-             << size << " -- can’t fulfill request.\n";
+             << size << " -- can't fulfill request.\n";
         return 0;
 	}
    
@@ -363,7 +363,7 @@ void prog1()
    cout << "Please enter a position: ";
    cin >> pos;
     
-   // elem will hold the element’s value
+   // elem will hold the elementï¿½s value
    int elem;
 
    if ( fibon_elem( pos, elem ))

@@ -89,7 +89,7 @@ find_ver4( const elemType *array, int size,
 
 template <typename elemType>
 const elemType* 
-find_ver5( const elemType *first, 
+find_ver5( const elemType *first,
            const elemType *last, const elemType &value )
 {
 	if ( ! first || ! last )
@@ -147,12 +147,14 @@ void prog_find_vers()
 		 cerr << "?? find_ver3 failed with string array!\n";
 	else cerr << "!! find_ver3 ok with string array!\n";
 
-	iptr = find_ver4( begin( ivec ), ivec.size(), ivec[2] );
+//	iptr = find_ver4( begin( ivec ), ivec.size(), ivec[2] );
+	iptr = find_ver4( ivec.data(), ivec.size(), ivec[2] );
 	if ( iptr != &ivec[2] )
 		 cerr << "?? find_ver4 failed with int vector!\n";
 	else cerr << "!! find_ver4 ok with int vector!\n";
 
-	sptr = find_ver4( begin( svec ), svec.size(), svec[2] );
+//	sptr = find_ver4( begin( svec ), svec.size(), svec[2] );
+	sptr = find_ver4( svec.data(), svec.size(), svec[2] );
 	if ( sptr != &svec[2] )
 		 cerr << "?? find_ver4 failed with string vector!\n";
 	else cerr << "!! find_ver4 ok with string vector!\n";
@@ -162,12 +164,16 @@ void prog_find_vers()
 		 cerr << "?? find_ver5 failed with string array!\n";
 	else cerr << "!! find_ver5 ok with string array!\n";
 
-	iptr = find_ver5( begin( ivec ), end( ivec ), ivec[2] );
+//	iptr = find_ver5( begin( ivec ), end( ivec ), ivec[2] );
+    //也不太确定这个兼容性方案，参考176行find_ver5
+    iptr = find_ver5( &ivec.front(), &ivec.back(), ivec[2] );
 	if ( iptr != &ivec[2] )
 		 cerr << "?? find_ver5 failed with int vector!\n";
 	else cerr << "!! find_ver5 ok with int vector!\n";
 
-	iptr = find_ver5( begin( ivec ), end( ivec ), int_not_present );
+//	iptr = find_ver5( begin( ivec ), end( ivec ), int_not_present );
+    //也不太确定这个兼容性方案，对比169行find_ver5调用
+	iptr = find_ver5( &ivec[0], &ivec[ivec.size()-1], int_not_present );
 	if ( iptr != 0 )
 		 cerr << "?? find_ver5 failed with int not present in vector!\n";
 	else cerr << "!! find_ver5 ok with int not present in vector!\n";
@@ -219,8 +225,11 @@ filter_ver1( const vector<int> &vec,
 }
 
 vector<int> 
-filter_ver2( const vector<int> &vec, 
-             int val, less<int> &lt )
+//filter_ver2( const vector<int> &vec,
+//             int val, less<int> &lt )
+//兼容性问题，改变了less<int> &lt 为 less<int> lt，不确定是否有效
+filter_ver2( const vector<int> &vec,
+             int val, less<int> lt )
 {
     vector<int> nvec;
     vector<int>::const_iterator iter = vec.begin();
@@ -316,7 +325,9 @@ void prog_filter_vers()
                  partition_value, greater<int>() );
 
 	err_cnt = 0;
-	ix = solution_size;
+//	ix = solution_size;
+    //增加类型声明
+	int ix = solution_size;
 
 	for ( int iy = 0; ix < ivec.size(); ++ix, ++iy )
 		  if ( ivec[ ix ] != ivec2[ iy ] )

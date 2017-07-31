@@ -148,9 +148,11 @@ remove_value( const valType &val, BTnode *&prev )
       {
          prev = _rchild;
          if ( _lchild )
+         {//加了braces，避免悬垂dangling
 			  if ( ! prev->_lchild )
 				   prev->_lchild = _lchild;
 			  else BTnode<valType>::lchild_leaf( _lchild, prev->_lchild );
+         }
       }
       else prev = _lchild;
       delete this;
@@ -333,9 +335,12 @@ remove_root()
         // if left child of root is non-null
         // attach it as leaf to left subtree
         if ( lc )
-			 if ( ! newlc )
-				  _root->_lchild = lc;
-			 else BTnode<elemType>::lchild_leaf( lc, newlc );
+        {//加了braces，避免悬垂dangling
+            if ( ! newlc ) {
+                _root->_lchild = lc;
+            }
+            else BTnode<elemType>::lchild_leaf( lc, newlc );
+        }
     }
     else _root = _root->_lchild;
 
@@ -400,7 +405,7 @@ copy( BTnode<elemType> *&tar, BTnode<elemType> *src )
 #include <fstream>
 using namespace std;
 
-main() 
+int main()
 {
 	/*
     BinaryTree< int > bt;

@@ -250,7 +250,9 @@ void reset_seq( user_profile *puser )
 {
 	static string wherefrom( "reset_seq" );
 
-	int new_seq = gen_seq_id( reinterpret_cast<unsigned int>( puser ));
+//	int new_seq = gen_seq_id( reinterpret_cast<unsigned int>( puser ));
+    //兼容问题解决，指针32bits转为64bits的问题
+    int new_seq = gen_seq_id( reinterpret_cast<size_t >( puser ));
 	if ( new_seq == puser->cur_seq )
 		 new_seq = new_seq < ns_cnt ? new_seq+1 : 1;
 

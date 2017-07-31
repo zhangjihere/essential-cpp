@@ -173,9 +173,13 @@ void ex2_5()
     float farray[]={ 2.5, 24.8, 18.7, 4.1, 23.9 };
     vector<float> fvec( farray, farray+5 );
 
-    int imax = max( max( ivec ), max( iarray, 7 ));
-    float fmax = max( max( fvec ), max( farray, 5 ));
-    string smax = max( max( svec ), max( sarray, 6 ));
+//    int imax = max( max( ivec ), max( iarray, 7 ));
+//    float fmax = max( max( fvec ), max( farray, 5 ));
+//    string smax = max( max( svec ), max( sarray, 6 ));
+    //兼容问题解决，call to 'max' is ambiguous, 加上命名空间std
+    int imax = std::max(max(ivec), max(iarray, 7));
+    float fmax = std::max(max(fvec), max(farray, 5));
+    string smax = std::max(max(svec), max(sarray, 6));
 
 	cout << "imax should be 169  -- found: " << imax << "\n"
 	     << "fmax should be 24.8 -- found: " << fmax << "\n"

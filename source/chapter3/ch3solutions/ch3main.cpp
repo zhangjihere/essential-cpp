@@ -39,9 +39,10 @@ void display_vector( const vector<elemType> &vec,
 {
 //	 vector<elemType>::const_iterator
 	//参考：https://stackoverflow.com/questions/8246117/compiling-error-on-template-method-return-is-instance-from-inner-class
-	//使用如下兼容性方案，把typename放到适当的位置
+	//使用如下兼容性方案，把typename放到适当的位置，
+	//改为调用begin()和end(),在centOS7 64bits gcc-4.8.5的环境下，使用vec.cbegin()或者vec.cend()出现问题，而在macOS clang 8.1编译通过
 	typename vector<elemType>::const_iterator
-               iter = vec.cbegin(),
+               iter = vec.begin(),
                end_it = vec.end();
 
     int elem_cnt = 1;

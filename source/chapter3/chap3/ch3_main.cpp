@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <iterator>
+
 using namespace std;
 
 // globals as convenience for executing procedures
@@ -363,6 +365,7 @@ void prog_io_std()
 {
 	cout << "please enter some text, then indicate end of file!\n";
 
+    //兼容性问题，在centOS7 64bits下增加#include <iterator>
 	istream_iterator< string > is( cin );
 	istream_iterator< string > eof;
 

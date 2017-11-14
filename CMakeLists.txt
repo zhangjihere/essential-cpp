@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(essential_cpp)
 
+
 set(CMAKE_CXX_STANDARD 11)
 
 # chapter1
@@ -65,3 +66,33 @@ set(CHAP6_STRATEGY_SOURCE_FILES ${CHAP6_STRATEGY_PATH}/s_main.cpp)
 set(CHAP6_SOLUTION_PATH source/chapter6/ch6solutions)
 set(CHAP6_SOLUTION_SOURCE_FILES ${CHAP6_SOLUTION_PATH}/ch6main.cpp)
   add_executable(ch6_solution ${CHAP6_SOLUTION_SOURCE_FILES})
+
+#log4cpp demo
+set(LOG_EXAMPLE_PATH source/log4cpp)
+#set(CMAKE_CXX_FLAGS "-llog4cpp -pthread") #配置连接库 liblog4cpp.so，以及-pthread 多线程支持
+link_libraries(log4cpp pthread)
+#拷贝log4cpp配置文件
+#EXEC_PROGRAM(cp ARGS ${CMAKE_CURRENT_SOURCE_DIR}/configs/* -r .
+#        OUTPUT_VARIABLE LS_OUTPUT RETURN_VALUE LS_RVALUE)
+#IF (LS_RVALUE)
+#    MESSAGE(STATUS "Copying config files - error: " ${LS_OUTPUT})
+#ELSE ()
+#    MESSAGE(STATUS "Copying config files - done")
+#ENDIF ()
+
+#log4cpp example
+set(LOG_EXAMPLE_SRC_FILES ${LOG_EXAMPLE_PATH}/log_example.cpp)
+  add_executable(log_exmp ${LOG_EXAMPLE_SRC_FILES})
+#log4cpp properties example
+set(LOG_PROP_EXAMPLE_SRC_FILES ${LOG_EXAMPLE_PATH}/log_prop_example.cpp)
+  add_executable(log_prop_exmp ${LOG_PROP_EXAMPLE_SRC_FILES})
+set(LOG_TEST_SRC_FILES ${LOG_EXAMPLE_PATH}/log_test.cpp)
+  add_executable(log_test ${LOG_TEST_SRC_FILES})
+set(prop_file_path ${PROJECT_SOURCE_DIR}/configs)
+#should run 'build' modified cpp or h to invoke follow add_custom_command
+add_custom_command(TARGET log_test        # Adds a post-build event to MyTest
+    COMMAND echo "copy configs/*.properties file..."
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+    "${prop_file_path}/cp4cc_log.properties" "${prop_file_path}/log4cpp.properties" # <--this is in-file
+    $<TARGET_FILE_DIR:log_test>)                 # <--this is out-file path
+
